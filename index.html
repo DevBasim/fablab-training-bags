@@ -19,24 +19,7 @@
 <section class="editor-section" data-section-panel="export"><div class="section-card export-card"><span class="eyebrow">القسم 7</span><h3>التصدير إلى Excel</h3><p>سيتم تعبئة قالب الحقيبة الأصلي في مواضعه المحددة، مع إبقاء التصميم كما هو.</p><div class="export-status" id="exportStatus">احفظ الحقيبة أولاً ثم صدّرها.</div><button class="primary" id="exportExcel">تصدير الحقيبة إلى Excel</button></div></section>
 </div></div></div></div>
 </main></section>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="app.js"></script>
-<script>
-(async function(){
-const departmentOptions=[
-  ['3335293c-eae7-42bb-97ad-888f3ecdffb8','الإلكترونيات'],
-  ['83781fd9-0356-4624-b0c1-1ba0d1c6e804','الخشب CNC'],
-  ['4934cc5d-2587-4aed-90b6-9ddddd541a73','الروبوتات'],
-  ['7313aeae-b9da-444b-9283-bf6b6ea454de','الطباعة ثلاثية الأبعاد'],
-  ['34bd7cc3-078c-4279-8ef0-809efc6cb519','الليزر'],
-  ['5c6bd145-e0be-4554-b9b0-c65a85222fac','كيدز لاب']
-];
-const dep=document.getElementById('f_department');
-if(dep)dep.innerHTML='<option value="">اختر القسم</option>'+departmentOptions.map(d=>`<option value="${d[0]}">${d[1]}</option>`).join('');
-window.departments=departmentOptions.map(d=>({id:d[0],name:d[1]}));
-document.getElementById('managerLoginToggle').onclick=()=>document.getElementById('managerAuthForm').classList.toggle('hidden');
-document.getElementById('managerAuthForm').onsubmit=async e=>{e.preventDefault();try{const r=await db.auth.signInWithPassword({email:document.getElementById('managerEmail').value.trim(),password:document.getElementById('managerPassword').value});if(r.error)throw r.error;await boot(r.data.user)}catch(err){authMsg(err.message||'بيانات دخول الإدارة غير صحيحة',true)}};
-document.getElementById('authForm').onsubmit=async e=>{e.preventDefault();const btn=document.getElementById('authSubmit');btn.disabled=true;try{const email=document.getElementById('email').value.trim().toLowerCase();if(!email)throw new Error('اكتب البريد الإلكتروني');const r=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:window.location.origin+window.location.pathname}});if(r.error)throw r.error;localStorage.setItem('loginEmail',email);authMsg('تم إرسال رابط الدخول إلى بريدك الإلكتروني. افتحه للمتابعة.')}catch(err){authMsg(err.message||'تعذر إرسال رابط الدخول.',true)}finally{btn.disabled=false}};
-})();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="app.js?v=20260912-2"></script>
+
 </body>
 </html>
