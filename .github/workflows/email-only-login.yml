@@ -1,0 +1,62 @@
+name: Email only login
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch staff login
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          auth='''<section id="authView" class="auth-shell"><div class="auth-card"><div class="brand-mark">FL</div><span class="eyebrow">فاب لاب الأحساء</span><h1>نظام الحقائب التدريبية</h1><p class="muted">اكتب بريدك الإلكتروني للدخول مباشرة إلى النظام.</p><form id="authForm"><label>البريد الإلكتروني<input id="email" type="email" required placeholder="name@fablab.sa" autocomplete="email"></label><button class="primary wide" id="authSubmit">دخول للنظام</button></form><div id="authMessage" class="form-message"></div></div></section>'''
+          s=re.sub(r'<section id="authView".*?</section>',auth,s,count=1,flags=re.S)
+          needle='<label>اسم البرنامج التدريبي<input id="f_name" placeholder="الاسم الرسمي المختصر"></label>'
+          dept='''<label>اسم البرنامج التدريبي<input id="f_name" placeholder="الاسم الرسمي المختصر"></label><label>القسم<select id="f_department" required><option value="">اختر القسم</option></select></label>'''
+          if 'id="f_department"' not in s:s=s.replace(needle,dept,1)
+          marker='<script src="app.js"></script>'
+          s=re.sub(r'(<script src="app\.js"></script>).*',r'''\1
+<script>
+(async function(){
+  async function wait(){for(let i=0;i<120;i++){if(window.db||typeof db!=="undefined")return;await new Promise(r=>setTimeout(r,100))}}
+  await wait();
+  if(typeof loadDepartments==='function')await loadDepartments();
+  const dep=document.getElementById('f_department');
+  if(dep)dep.innerHTML='<option value="">اختر القسم</option>'+(window.departments||[]).map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('authForm').onsubmit=async e=>{
+    e.preventDefault();const btn=document.getElementById('authSubmit');btn.disabled=true;
+    try{const email=document.getElementById('email').value.trim().toLowerCase();if(!email)throw new Error('اكتب البريد الإلكتروني');
+      const r=await db.auth.signInAnonymously({options:{data:{email,display_name:email}}});if(r.error)throw r.error;
+      localStorage.setItem('loginEmail',email);await boot(r.data.user);
+    }catch(err){authMsg(err.message||'تعذر الدخول. فعّل الدخول المجهول في Supabase.',true)}finally{btn.disabled=false}
+  };
+})();
+</script>
+</body>
+</html>''',s,count=1,flags=re.S)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('app.js');s=p.read_text(encoding='utf-8')
+          s=s.replace("function fillForm(d){const map={f_name:","function fillForm(d){const dep=$(\'f_department\');if(dep)dep.value=d.department_id||localStorage.getItem(\'selectedDepartmentId\')||\'\';const map={f_name:",1)
+          s=s.replace("function clearForm(){['f_name'","function clearForm(){const dep=$(\'f_department\');if(dep)dep.value=localStorage.getItem(\'selectedDepartmentId\')||\'\';['f_name'",1)
+          s=s.replace("if(!window.departments?.length){return toast('لا يوجد قسم مضاف في النظام بعد','error')}let departmentId=window.departments[0].id;let payload=","if(!window.departments?.length){return toast('لا يوجد قسم مضاف في النظام بعد','error')}const departmentId=$(\'f_department\')?.value;if(!departmentId)return toast('اختر القسم أولاً','error');localStorage.setItem('selectedDepartmentId',departmentId);let payload=",1)
+          old="async function ensureProfile(user){const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();if(data?.full_name)$('userName').textContent=data.full_name;if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden')}"
+          new="async function ensureProfile(user){const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();if(data?.full_name)$('userName').textContent=data.full_name;if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');if(!data&&user.is_anonymous){const email=user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});$('userName').textContent=email}}"
+          if old not in s:raise SystemExit('profile pattern not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html app.js
+          git diff --cached --quiet || git commit -m "feat: email-only staff login"
+          git push
