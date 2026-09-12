@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>حقائب فاب لاب التدريبية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="authView" class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-mark">FL</div>
+      <span class="eyebrow">فاب لاب الأحساء</span>
+      <h1>نظام الحقائب التدريبية</h1>
+      <p class="muted">أنشئ الحقيبة، احفظ تقدمك، وأكملها في أي وقت.</p>
+
+      <form id="authForm">
+        <label>البريد الإلكتروني<input id="email" type="email" placeholder="name@fablab.sa" required /></label>
+        <label>كلمة المرور<input id="password" type="password" placeholder="••••••••" minlength="6" required /></label>
+        <button class="primary wide" type="submit" id="authSubmit">تسجيل الدخول</button>
+      </form>
+      <button class="link-btn" id="toggleAuth">ليس لديك حساب؟ إنشاء حساب</button>
+      <div id="authMessage" class="form-message"></div>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><div class="brand-mark small">FL</div><div><strong>فاب لاب</strong><span>الحقائب التدريبية</span></div></div>
+      <nav>
+        <button class="nav-item active" data-page="dashboard">الرئيسية</button>
+        <button class="nav-item" data-page="bags">حقائبي</button>
+        <button class="nav-item" data-page="create">إنشاء حقيبة</button>
+        <button class="nav-item manager-only hidden" data-page="manager">إدارة الحقائب</button>
+      </nav>
+      <div class="sidebar-bottom"><span id="userName">المستخدم</span><button id="logoutBtn" class="logout">تسجيل الخروج</button></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar"><div><span class="eyebrow">نظام إدارة المحتوى التدريبي</span><h2 id="pageTitle">الرئيسية</h2></div><button class="primary" id="newBagTop">+ حقيبة جديدة</button></header>
+
+      <div id="page-dashboard" class="page">
+        <div class="hero"><div><span class="hero-kicker">مرحباً بك 👋</span><h3>خلّ إنجاز الحقيبة أسهل من Excel</h3><p>قسّم العمل إلى خطوات واضحة، احفظ كل تعديل، وتابع نسبة الإنجاز حتى تكتمل الحقيبة.</p><button class="primary" id="startBag">ابدأ حقيبة جديدة</button></div><div class="hero-stat"><strong id="bagCount">0</strong><span>حقيبة محفوظة</span></div></div>
+        <div class="stats-grid"><div class="stat-card"><span>المسودات</span><strong id="draftCount">0</strong></div><div class="stat-card"><span>قيد المراجعة</span><strong id="reviewCount">0</strong></div><div class="stat-card"><span>مكتملة</span><strong id="doneCount">0</strong></div><div class="stat-card"><span>متوسط الإنجاز</span><strong id="avgProgress">0%</strong></div></div>
+        <div class="section-card"><div class="section-head"><div><h3>آخر الحقائب</h3><p>آخر الحقائب التي أنشأتها أو عدّلتها.</p></div><button class="text-btn" data-page-jump="bags">عرض الكل</button></div><div id="recentBags" class="bag-list empty">لا توجد حقائب حتى الآن.</div></div>
+      </div>
+
+      <div id="page-bags" class="page hidden"><div class="section-card"><div class="section-head"><div><h3>حقائبي</h3><p>كل الحقائب المرتبطة بحسابك.</p></div><button class="primary" id="newBagList">+ إنشاء حقيبة</button></div><div id="allBags" class="bag-list empty">جاري التحميل...</div></div></div>
+
+      <div id="page-create" class="page hidden">
+        <div class="section-card form-card">
+          <div class="section-head"><div><span class="eyebrow">الخطوة 1 من 6</span><h3>بيانات الحقيبة</h3><p>ابدأ بالمعلومات الأساسية، ويمكنك الرجوع وإكمالها لاحقاً.</p></div><span class="progress-pill" id="formProgress">0%</span></div>
+          <div class="progress-bar"><span id="progressFill"></span></div>
+          <form id="bagForm" class="form-grid">
+            <label>اسم الحقيبة / البرنامج<input id="bagName" required placeholder="مثال: معسكر صيفك روبوت" /></label>
+            <label>القسم<select id="department" required><option value="">اختر القسم</option></select></label>
+            <label>حالة الحقيبة<select id="status"><option value="draft">مسودة</option><option value="review">قيد المراجعة</option></select></label>
+            <div class="form-actions"><button type="button" class="secondary" id="cancelCreate">إلغاء</button><button type="submit" class="primary">حفظ ومتابعة</button></div>
+          </form>
+        </div>
+        <div class="section-card roadmap"><h3>مراحل الحقيبة القادمة</h3><div class="steps"><div class="step active"><b>1</b><span>بيانات البرنامج</span></div><div class="step"><b>2</b><span>المخرجات والأهداف</span></div><div class="step"><b>3</b><span>خطة التنفيذ</span></div><div class="step"><b>4</b><span>الاحتياجات والموارد</span></div><div class="step"><b>5</b><span>المرفقات والمراجعة</span></div><div class="step"><b>6</b><span>التصدير إلى Excel</span></div></div></div>
+      </div>
+
+      <div id="page-manager" class="page hidden"><div class="section-card"><div class="section-head"><div><h3>إدارة الحقائب</h3><p>عرض ومتابعة جميع الحقائب المسموح لك بإدارتها.</p></div></div><div id="managerBags" class="bag-list empty">جاري التحميل...</div></div></div>
+    </main>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
