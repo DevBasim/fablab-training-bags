@@ -1,34 +1,70 @@
 (()=>{
   const $=id=>document.getElementById(id);
   let saveTimer=null;
-  const scheduleSave=()=>{
-    clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{
-      const b=$('saveBag');
-      const editor=$('page-editor');
-      if(b && editor && !editor.classList.contains('hidden')) b.click();
-    },900);
-  };
+  const scheduleSave=()=>{clearTimeout(saveTimer);saveTimer=setTimeout(()=>{const b=$('saveBag'),ed=$('page-editor');if(b&&ed&&!ed.classList.contains('hidden'))b.click()},900)};
   const bindAutoSave=()=>{
-    document.addEventListener('input',e=>{if(e.target.closest('#page-editor'))scheduleSave();},true);
-    document.addEventListener('change',e=>{if(e.target.closest('#page-editor'))scheduleSave();},true);
-    document.addEventListener('click',e=>{if(e.target.closest('#addObjective,#addOutput,#addDay,#addHuman,#addMaterial,.danger'))scheduleSave();},true);
-    setInterval(()=>{
-      const editor=$('page-editor'),b=$('saveBag');
-      if(editor&&b&&!editor.classList.contains('hidden'))b.click();
-    },5000);
+    document.addEventListener('input',e=>{if(e.target.closest('#page-editor'))scheduleSave()},true);
+    document.addEventListener('change',e=>{if(e.target.closest('#page-editor'))scheduleSave()},true);
+    document.addEventListener('click',e=>{if(e.target.closest('#addObjective,#addOutput,#addDay,#addHuman,#addMaterial,.danger'))scheduleSave()},true);
+    setInterval(()=>{const ed=$('page-editor'),b=$('saveBag');if(ed&&b&&!ed.classList.contains('hidden'))b.click()},5000);
   };
+  const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
+  const controlValue=c=>{
+    if(!c)return '';
+    if(c.tagName==='SELECT')return Array.from(c.selectedOptions).map(o=>clean(o.textContent)).join(', ');
+    if(c.type==='checkbox')return c.checked?'نعم':'لا';
+    if(c.type==='file')return c.files?.[0]?.name||'';
+    return c.value??'';
+  };
+  const labelTitle=label=>{const clone=label.cloneNode(true);clone.querySelectorAll('input,textarea,select').forEach(x=>x.remove());return clean(clone.textContent)};
   const exportWorkbook=()=>{
     try{
       if(typeof XLSX==='undefined')throw new Error('مكتبة Excel غير محملة.');
-      const rows=[]; const text=id=>{const e=$(id);return e?e.value.trim():''}; const num=id=>{const v=text(id);return v===''?'':Number(v)};
-      const add=(title,value)=>{rows.push([title]);rows.push([value==null?'':String(value)]);rows.push([])};
-      rows.push(['قالب الحقيبة التدريبية - فاب لاب الأحساء']);rows.push([]);
-      add('اسم البرنامج التدريبي',text('f_name'));add('القسم',$('f_department')?.selectedOptions?.[0]?.text||'');add('وصف البرنامج التدريبي',text('f_description'));add('نوع البرنامج',text('f_program_type'));add('المجال الأساسي',text('f_primary_field'));add('المجالات المساندة',text('f_supporting_fields'));add('الأجهزة والبرامج',text('f_devices_software'));add('أهداف البرنامج',(window.state?.objectives||[]).map((o,i)=>(i+1)+'. '+o.text).join('\n'));add('المستوى',text('f_level'));add('نوع التطبيق العملي',text('f_practical'));add('المدة',(num('f_days')||'')+' يوم / '+(num('f_hours')||'')+' ساعة');add('الفئة العمرية',(num('f_age_min')||'')+' - '+(num('f_age_max')||''));add('الفئة المستهدفة',text('f_target'));add('عدد المشاركين',num('f_participants'));add('تقسيم المشاركين',text('f_split'));add('شروط الالتحاق',text('f_requirements'));add('مُعدّ المحتوى العلمي',text('f_author'));add('رقم الإصدار وتاريخ التحديث',text('f_version'));add('تكلفة المستهلكات',num('f_consumables'));add('تكلفة تأسيسية غير متكررة',num('f_setup'));add('اعتبارات أخرى',text('f_other'));
-      const s=window.state||{};rows.push(['المخرجات وتسليماتها'],['المخرج','النوع','الوصف','الكمية','الملكية','ما الذي سنقيسه؟','النتيجة المطلوبة','طريقة التحقق']);(s.outputs||[]).forEach(o=>rows.push([o.name,o.output_type,o.description,o.quantity,o.ownership,o.measurement?.what_to_measure||'',o.measurement?.required_result||'',o.measurement?.verification_method||'']));rows.push([],['خطة التنفيذ'],['اليوم','ماذا سنتعلم؟','المحاور','الأهداف المرتبطة','المخرجات المرتبطة','التنفيذ والمدة','التحقق']);(s.days||[]).forEach(d=>rows.push([d.day_no,d.what_to_learn,d.topics,(d.objective_ids||[]).map(x=>Number(x)+1).join(', '),(d.output_ids||[]).join(', '),d.execution_duration,d.verification]));rows.push([],['الموارد البشرية'],['المورد','العدد','الخبرة أو الشروط المطلوبة','المهام']);(s.human||[]).forEach(h=>rows.push([h.resource_type,h.quantity,h.requirements,h.responsibilities]));rows.push([],['الاحتياجات المادية والتقنية'],['الاحتياج','المواصفات','الوحدة','الكمية للفرد/المجموعة','الكمية الإجمالية','ملاحظات']);(s.material||[]).forEach(m=>rows.push([m.item,m.specifications,m.unit,m.quantity_per_person_group,m.total_quantity,m.notes]));rows.push([],['الجاهزية قبل التنفيذ'],['الفئة','جاهز؟','ما يجب تجهيزه أو التحقق منه','المدة اللازمة قبل التنفيذ','ملاحظات']);(s.readiness||[]).forEach(r=>rows.push([r.category,r.is_ready?'نعم':'لا',r.preparation_requirements,r.lead_time,r.notes]));rows.push([],['المرفقات'],['نوع المرفق','اسم الملف']);Object.keys(s.attachments||{}).forEach(k=>{const f=s.attachments[k];if(f)rows.push([k,f.name])});
-      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:32},{wch:28},{wch:42},{wch:18},{wch:18},{wch:30},{wch:30},{wch:32}];ws['!rtl']=true;const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');XLSX.writeFile(wb,(text('f_name')||'الحقيبة التدريبية').replace(/[\\/:*?"<>|]/g,'-').slice(0,80)+'.xlsx');
-    }catch(err){console.error(err);const status=$('exportStatus');if(status)status.textContent='تعذر التصدير: '+(err?.message||err);}
+      const ed=$('page-editor');if(!ed)throw new Error('محرر الحقيبة غير موجود.');
+      const rows=[['قالب الحقيبة التدريبية - فاب لاب الأحساء'],[]];
+      const add=(title,value)=>{if(clean(value)!=='')rows.push([title,String(value)]);};
+      // جميع الحقول الأساسية الظاهرة في المحرر
+      ed.querySelectorAll(':scope > * label, .form-grid label').forEach(label=>{const c=label.querySelector('input,textarea,select');const t=labelTitle(label);if(t&&c)add(t,controlValue(c))});
+      // الأهداف
+      const objectives=ed.querySelector('#objectivesList');
+      if(objectives){rows.push([],['الأهداف']);objectives.querySelectorAll('.objective-row').forEach(r=>{const n=clean(r.querySelector('b')?.textContent);const v=clean(r.querySelector('span')?.textContent);if(v)rows.push([n+'. الهدف',v])})}
+      // الأقسام المتكررة: المخرجات، خطة التنفيذ، الموارد البشرية، المواد، الجاهزية
+      const section=(title,selector)=>{
+        const root=ed.querySelector(selector);if(!root)return;
+        const items=root.querySelectorAll(':scope > .repeat-item, :scope > .readiness-item');if(!items.length)return;
+        rows.push([], [title]);
+        items.forEach((item,i)=>{
+          rows.push([title+' '+(i+1)]);
+          item.querySelectorAll('label').forEach(label=>{const c=label.querySelector('input,textarea,select');const t=labelTitle(label);if(t&&c)add(t,controlValue(c))});
+          const checks=item.querySelectorAll('input[type="checkbox"]');checks.forEach(c=>{const parent=c.parentElement;if(parent&&!parent.querySelector('label'))add(clean(parent.textContent),c.checked?'نعم':'لا')});
+          rows.push([]);
+        });
+      };
+      section('المخرجات وتسليماتها','#outputsList');
+      section('خطة التنفيذ','#daysList');
+      section('الموارد البشرية','#humanList');
+      section('الاحتياجات المادية والتقنية','#materialList');
+      section('الجاهزية قبل التنفيذ','#readinessList');
+      // المرفقات
+      const attachments=ed.querySelector('#attachmentList');
+      if(attachments){rows.push([],['المرفقات']);attachments.querySelectorAll('.attachment-card').forEach(card=>{const name=clean(card.querySelector('h4')?.textContent);const file=clean(card.querySelector('.file-name')?.textContent);if(name)rows.push([name,file])})}
+      // أي حقول إضافية لم يتم التقاطها: نمر على كل control ونضيفه باسم الـ id/placeholder، حتى لا تضيع أي كتابة مستقبلية.
+      const seen=new Set();rows.forEach(r=>{if(r[0])seen.add(clean(r[0]))});
+      ed.querySelectorAll('input:not([type="file"]),textarea,select').forEach(c=>{
+        if(c.closest('.repeat-item,.readiness-item,.attachment-card,#objectivesList'))return;
+        const value=controlValue(c);if(!clean(value))return;
+        const label=c.closest('label');const title=label?labelTitle(label):clean(c.getAttribute('aria-label')||c.placeholder||c.name||c.id);
+        if(title&&!seen.has(title)){rows.push([title,String(value)]);seen.add(title)}
+      });
+      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:38},{wch:70}];ws['!rtl']=true;
+      Object.keys(ws).forEach(k=>{if(k[0]==='!')return;ws[k].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'}}});
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');
+      const name=clean($('f_name')?.value)||'الحقيبة التدريبية';
+      XLSX.writeFile(wb,name.replace(/[\\/:*?"<>|]/g,'-').slice(0,80)+'.xlsx');
+      const status=$('exportStatus');if(status)status.textContent='تم تصدير جميع البيانات المدخلة.';
+    }catch(err){console.error(err);const status=$('exportStatus');if(status)status.textContent='تعذر التصدير: '+(err?.message||err)}
   };
-  const bind=()=>{const b=$('exportExcel');if(b)b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();exportWorkbook();},true)};
-  const start=()=>{bindAutoSave();bind()};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+  const bind=()=>{const b=$('exportExcel');if(b)b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();exportWorkbook()},true)};
+  const start=()=>{bindAutoSave();bind()};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
