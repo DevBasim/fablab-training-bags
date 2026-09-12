@@ -53,15 +53,17 @@
       ws['!rtl']=true;
       for(const cell of Object.keys(ws)){if(cell[0]==='!')continue;ws[cell].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'}};}
       if(ws.A1)ws.A1.s={font:{bold:true,sz:18},alignment:{horizontal:'center',vertical:'center'}};
-      const range=XLSX.utils.decode_range(ws['!ref']);
-      for(let r=0;r<=range.e.r;r++)ws['!rows']??=[];
-      ws['!rows'][0]={hpt:30};
+      ws['!rows']=[];ws['!rows'][0]={hpt:30};
       const safeName=(text('f_name')||'الحقيبة التدريبية').replace(/[\\/:*?"<>|]/g,'-').slice(0,80);
       XLSX.writeFile(wb,safeName+'.xlsx');
       const status=$('exportStatus');if(status)status.textContent='تم تصدير الحقيبة بالبيانات بنجاح.';
       if(typeof toast==='function')toast('تم تصدير ملف Excel بالبيانات بنجاح');
     }catch(err){console.error(err);const status=$('exportStatus');if(status)status.textContent='تعذر التصدير: '+(err?.message||err);if(typeof toast==='function')toast('تعذر التصدير: '+(err?.message||err),'error');}
   };
-  const bind=()=>{const b=$('exportExcel');if(b){b.onclick=exportWorkbook;b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation()},{capture:true});}};
+  const bind=()=>{
+    const b=$('exportExcel');
+    if(!b)return;
+    b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();exportWorkbook();},true);
+  };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
