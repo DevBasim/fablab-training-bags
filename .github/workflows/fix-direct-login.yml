@@ -1,0 +1,34 @@
+name: Fix direct employee login
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch app
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('app.js')
+          s=p.read_text()
+          old="""async function ensureProfile(user){\n const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();\n if(data?.full_name)$('userName').textContent=data.full_name;\n if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');\n if(!data&&user.is_anonymous){\n   const email=user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';\n   await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});\n   $('userName').textContent=email\n }\n}"""
+          new="""async function ensureProfile(user){\n const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();\n if(data?.full_name)$('userName').textContent=data.full_name;\n if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');\n if(!data){\n   const email=user.email||user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';\n   const {error}=await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});\n   if(!error)$('userName').textContent=email;\n }\n}"""
+          if old not in s:
+            print('ensureProfile pattern not found; trying broader replacement')
+            a=s.index('async function ensureProfile(user){')
+            b=s.index('\n}',a)+2
+            s=s[:a]+new+s[b:]
+          else:
+            s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js
+          git diff --cached --quiet || git commit -m "Fix direct employee profile ownership"
+          git push
