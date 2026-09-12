@@ -1,0 +1,29 @@
+name: Fix department select
+on:
+  push:
+    branches: [main]
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch department selector
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '''async function wait(){for(let i=0;i<120;i++){if(window.db||typeof db!=="undefined")return;await new Promise(r=>setTimeout(r,100))}\nawait wait();\nif(typeof loadDepartments==='function')await loadDepartments();\nconst dep=document.getElementById('f_department');\nif(dep)dep.innerHTML='<option value="">اختر القسم</option>'+(window.departments||[]).map(d=>`<option value="${d.id}">${d.name}</option>`).join('');'''
+          new = '''const departmentOptions=[\n  ['3335293c-eae7-42bb-97ad-888f3ecdffb8','الإلكترونيات'],\n  ['83781fd9-0356-4624-b0c1-1ba0d1c6e804','الخشب CNC'],\n  ['4934cc5d-2587-4aed-90b6-9ddddd541a73','الروبوتات'],\n  ['7313aeae-b9da-444b-9283-bf6b6ea454de','الطباعة ثلاثية الأبعاد'],\n  ['34bd7cc3-078c-4279-8ef0-809efc6cb519','الليزر'],\n  ['5c6bd145-e0be-4554-b9b0-c65a85222fac','كيدز لاب']\n];\nconst dep=document.getElementById('f_department');\nif(dep)dep.innerHTML='<option value="">اختر القسم</option>'+departmentOptions.map(d=>`<option value="${d[0]}">${d[1]}</option>`).join('');\nwindow.departments=departmentOptions.map(d=>({id:d[0],name:d[1]}));\nif(typeof loadDepartments==='function'){try{await loadDepartments();}catch(e){}\n  if(dep && window.departments?.length)dep.innerHTML='<option value="">اختر القسم</option>'+window.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');\n}'''
+          if old not in s:
+              raise SystemExit('target block not found')
+          p.write_text(s.replace(old,new), encoding='utf-8')
+          PY
+      - name: Commit patch and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/fix-department-select.yml
+          git add index.html .github/workflows/fix-department-select.yml
+          git diff --cached --quiet || git commit -m "fix: populate department selector"
+          git push
