@@ -1,0 +1,40 @@
+name: Fix Excel template source
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch export source
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('app.js')
+          s=p.read_text()
+          old="""    for(const url of ['/template.xlsx','assets/training-bag-template.xlsx']){\n      const r=await fetch(url+'?v=20260912-6',{cache:'no-store'});\n      if(r.ok){buf=await r.arrayBuffer();break;}\n    }"""
+          new="""    const r=await fetch('assets/training-bag-template.xlsx?v=20260912-8',{cache:'no-store'});\n    if(r.ok){\n      const type=(r.headers.get('content-type')||'').toLowerCase();\n      if(!type.includes('text/html')) buf=await r.arrayBuffer();\n    }"""
+          if old not in s:
+              raise SystemExit('target export source block not found')
+          p.write_text(s.replace(old,new,1))
+          idx=Path('index.html')
+          x=idx.read_text()
+          x=x.replace('app.js?v=20260912-7','app.js?v=20260912-8')
+          idx.write_text(x)
+          PY
+          node --check app.js
+      - name: Commit
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.js index.html
+          git commit -m 'Fix Excel template source and cache version'
+          git push
+          git rm .github/workflows/fix-excel-source.yml
+          git commit -m 'Remove temporary Excel source workflow'
+          git push
