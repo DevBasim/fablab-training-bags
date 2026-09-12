@@ -1,0 +1,42 @@
+name: Restore app and fix department
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore complete app and fix department dropdown
+        shell: bash
+        run: |
+          git checkout 014bbac30fa3b4e49a8b19b3770023619cd1f71c -- app.js
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('app.js')
+          s=p.read_text()
+          old="async function loadDepartments(){const {data,error}=await db.from('departments').select('id,name').eq('is_active',true).order('name');if(error)return;window.departments=data||[]}"
+          new="async function loadDepartments(){const {data,error}=await db.from('departments').select('id,name').eq('is_active',true).order('name');if(error){console.error(error);return}window.departments=data||[];const dep=$('f_department');if(dep){dep.innerHTML='<option value=\"\">اختر القسم</option>';window.departments.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.name;dep.appendChild(o)});const saved=localStorage.getItem('selectedDepartmentId');if(saved)dep.value=saved}}"
+          if old not in s:
+            raise SystemExit('loadDepartments pattern not found')
+          s=s.replace(old,new,1)
+          start=s.index('function setupAuth(){')
+          end=s.index('\nasync function init(){',start)
+          safe='''function setupAuth(){\n  const form=$(\"authForm\");\n  if(form){\n    form.onsubmit=async e=>{\n      e.preventDefault();\n      const email=$(\"email\")?.value.trim().toLowerCase()||\"\";\n      const password=$(\"password\")?.value||\"\";\n      if(!email||!password){authMsg(\"أدخل البريد الإلكتروني وكلمة المرور.\",true);return}\n      $(\"authSubmit\").disabled=true;\n      authMsg(\"جاري تسجيل الدخول...\");\n      const {data,error}=await db.auth.signInWithPassword({email,password});\n      $(\"authSubmit\").disabled=false;\n      if(error){authMsg(error.message,true);return}\n      localStorage.setItem(\"loginEmail\",email);\n      await boot(data.user);\n    };\n  }\n  const managerForm=$(\"managerAuthForm\");\n  if(managerForm){\n    managerForm.onsubmit=async e=>{\n      e.preventDefault();\n      const email=$(\"managerEmail\")?.value.trim().toLowerCase()||\"\";\n      const password=$(\"managerPassword\")?.value||\"\";\n      if(!email||!password){authMsg(\"أدخل بيانات المدير.\",true);return}\n      const {data,error}=await db.auth.signInWithPassword({email,password});\n      if(error){authMsg(error.message,true);return}\n      const {data:profile}=await db.from(\"profiles\").select(\"role\").eq(\"id\",data.user.id).maybeSingle();\n      if(profile?.role!==\"project_manager\"&&profile?.role!==\"admin\"){await db.auth.signOut();authMsg(\"هذا الحساب ليس حساب إدارة.\",true);return}\n      await boot(data.user);\n    };\n  }\n  const managerToggle=$(\"managerLoginToggle\");\n  if(managerToggle){\n    managerToggle.onclick=()=>{\n      $(\"managerAuthForm\")?.classList.toggle(\"hidden\");\n      $(\"authForm\")?.classList.toggle(\"hidden\");\n    };\n  }\n}'''
+          s=s[:start]+safe+s[end:]
+          p.write_text(s)
+          PY
+          sed -i 's/app.js?v=20260912-4/app.js?v=20260912-5/' index.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.js index.html
+          git commit -m 'Restore app logic and populate departments' || true
+          git push
+          git rm .github/workflows/restore-app-fix-department.yml || true
+          git commit -m 'Remove temporary restore workflow' || true
+          git push
