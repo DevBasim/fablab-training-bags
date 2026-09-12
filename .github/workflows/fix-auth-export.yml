@@ -1,0 +1,72 @@
+name: Fix auth and export
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch app.js
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('app.js')
+          s=p.read_text()
+          old="async function ensureProfile(user){const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();if(data?.full_name)$('userName').textContent=data.full_name;if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');if(!data&&user.is_anonymous){const email=user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});$('userName').textContent=email}}"
+          new="async function ensureProfile(user){const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();if(data?.full_name)$('userName').textContent=data.full_name;if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');if(!data){const email=user.email||user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';const {error}=await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});if(!error)$('userName').textContent=email}}"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('ensureProfile pattern not found')
+
+          old="async function loadBags(){const {data,error}=await db.from('training_bags').select('id,name,status,completion_percent,updated_at,department_id').order('updated_at',{ascending:false});if(error)return;const bags=data||[];renderBags($('allBags'),bags);renderBags($('recentBags'),bags.slice(0,5));$('bagCount').textContent=bags.length;$('draftCount').textContent=bags.filter(b=>b.status==='draft').length;$('reviewCount').textContent=bags.filter(b=>b.status==='review').length;$('doneCount').textContent=bags.filter(b=>b.status==='completed'||Number(b.completion_percent)>=100).length;$('avgProgress').textContent=(bags.length?Math.round(bags.reduce((s,b)=>s+Number(b.completion_percent||0),0)/bags.length):0)+'%'}"
+          new="async function loadBags(){const {data,error}=await db.from('training_bags').select('id,name,status,completion_percent,updated_at,department_id').order('updated_at',{ascending:false});if(error)return;const bags=data||[];renderBags($('allBags'),bags);renderBags($('recentBags'),bags.slice(0,5));$('bagCount').textContent=bags.length;$('draftCount').textContent=bags.filter(b=>b.status==='draft'||b.status==='in_progress').length;$('reviewCount').textContent=bags.filter(b=>b.status==='submitted'||b.status==='needs_revision').length;$('doneCount').textContent=bags.filter(b=>b.status==='approved'||Number(b.completion_percent)>=100).length;$('avgProgress').textContent=(bags.length?Math.round(bags.reduce((s,b)=>s+Number(b.completion_percent||0),0)/bags.length):0)+'%'}"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('loadBags pattern not found')
+
+          old="function statusText(s){return s==='review'?'قيد المراجعة':s==='completed'?'مكتملة':'مسودة'}"
+          new="function statusText(s){return s==='submitted'?'قيد المراجعة':s==='needs_revision'?'تحتاج تعديلاً':s==='approved'?'مكتملة':'مسودة'}"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('statusText pattern not found')
+
+          old="function fillForm(d){const dep=$('f_department');if(dep)dep.value=d.department_id||localStorage.getItem('selectedDepartmentId')||'';const map={f_name:'name',f_description:'description',f_program_type:'program_type',f_primary_field:'primary_field',f_devices_software:'devices_software',f_level:'level',f_practical:'practical_application_type',f_target:'target_audience',f_split:'participant_split',f_requirements:'admission_requirements',f_author:'scientific_content_author',f_version:'version',f_days:'duration_days',f_hours:'duration_hours',f_age_min:'age_min',f_age_max:'age_max',f_participants:'participant_count',f_consumables:'consumables_cost',f_setup:'setup_cost',f_other:'other_considerations'};Object.entries(map).forEach(([id,k])=>$(id).value=d[k]??'');$('f_supporting_fields').value=Array.isArray(d.supporting_fields)?d.supporting_fields.join(', '):'';$('reviewStatus').value=d.status||'draft';$('reviewComment').value=d.review_comment||''}"
+          new="function fillForm(d){const dep=$('f_department');if(dep)dep.value=d.department_id||localStorage.getItem('selectedDepartmentId')||'';const map={f_name:'name',f_description:'description',f_program_type:'program_type',f_primary_field:'primary_field',f_devices_software:'devices_software',f_level:'level',f_practical:'practical_application_type',f_target:'target_audience',f_split:'participant_split',f_requirements:'admission_requirements',f_author:'scientific_content_author',f_version:'version',f_days:'duration_days',f_hours:'duration_hours',f_age_min:'age_min',f_age_max:'age_max',f_participants:'participant_count',f_consumables:'consumables_cost',f_setup:'setup_cost',f_other:'other_considerations'};Object.entries(map).forEach(([id,k])=>$(id).value=d[k]??'');$('f_supporting_fields').value=Array.isArray(d.supporting_fields)?d.supporting_fields.join(', '):'';const statusMap={draft:'draft',in_progress:'draft',submitted:'review',needs_revision:'review',approved:'completed'};$('reviewStatus').value=statusMap[d.status]||'draft';$('reviewComment').value=d.review_comment||''}"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('fillForm pattern not found')
+
+          old="let payload={name,department_id:departmentId,owner_id:currentUser.id,status:$('reviewStatus').value,completion_percent:parseInt($('editorProgress').textContent)||0};"
+          new="const bagStatusMap={draft:'draft',review:'submitted',completed:'approved'};let payload={name,department_id:departmentId,owner_id:currentUser.id,status:bagStatusMap[$('reviewStatus').value]||'draft',completion_percent:parseInt($('editorProgress').textContent)||0};"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('payload pattern not found')
+
+          old="const reviewMap={draft:'pending',review:'pending',completed:'approved'};const reviewStatus=reviewMap[$('reviewStatus').value]||'pending';"
+          new="const reviewMap={draft:'draft',review:'submitted',completed:'approved'};const reviewStatus=reviewMap[$('reviewStatus').value]||'draft';"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('reviewMap pattern not found')
+
+          # Replace the incorrect template cell mapping used by exportExcel.
+          old="const f={name:'F6',description:'F7',program_type:'F8',primary_field:'F9',supporting_fields:'F10',devices_software:'F11',level:'F13',practical_application_type:'F14',duration_days:'F15',target_audience:'F17',participant_count:'F18',participant_split:'F19',admission_requirements:'F20',scientific_content_author:'F21',version:'F22',consumables_cost:'F23',setup_cost:'F24',other_considerations:'F25'};const pd=formData();if(ws['F6'])set('F6',val('f_name'));Object.entries(f).forEach(([k,c])=>{if(ws[c])set(c,k==='supporting_fields'?pd[k].join(', '):pd[k])});if(ws['F12'])set('F12',state.objectives.map((o,i)=>`${i+1}. ${o.text}`).join('\\n'));if(ws['F16'])set('F16',`${pd.age_min??''} - ${pd.age_max??''}`);"
+          new="const f={name:'A6',description:'A7',program_type:'A8',primary_field:'A9',supporting_fields:'A10',devices_software:'A11',level:'A13',practical_application_type:'A14',target_audience:'A17',participant_count:'A18',participant_split:'A19',admission_requirements:'A20',scientific_content_author:'A21',version:'A22',consumables_cost:'A23',setup_cost:'A24',other_considerations:'A25'};const pd=formData();if(ws['A5'])set('A5',$('f_department')?.selectedOptions?.[0]?.text||'');Object.entries(f).forEach(([k,c])=>{if(ws[c])set(c,k==='supporting_fields'?pd[k].join(', '):pd[k])});if(ws['A12'])set('A12',state.objectives.map((o,i)=>`${i+1}. ${o.text}`).join('\\n'));if(ws['A15'])set('A15',`${pd.duration_days??''} يوم / ${pd.duration_hours??''} ساعة`);if(ws['A16'])set('A16',`${pd.age_min??''} - ${pd.age_max??''}`);"
+          if old in s: s=s.replace(old,new,1)
+          else: raise SystemExit('export mapping pattern not found')
+
+          marker="async function init(){db=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_KEY);"
+          auth="""function setupAuth(){const form=$('authForm');if(form&&!$('password')){const label=document.createElement('label');label.innerHTML='كلمة المرور<input id=\"password\" type=\"password\" required placeholder=\"كلمة المرور\" autocomplete=\"current-password\">';form.insertBefore(label,form.querySelector('button'));}if(form){form.onsubmit=async e=>{e.preventDefault();const email=$('email').value.trim().toLowerCase(),password=$('password')?.value||'';if(!email||!password)return authMsg('أدخل البريد الإلكتروني وكلمة المرور.',true);$('authSubmit').disabled=true;authMsg('جاري تسجيل الدخول...');const {data,error}=await db.auth.signInWithPassword({email,password});$('authSubmit').disabled=false;if(error)return authMsg(error.message,true);localStorage.setItem('loginEmail',email);await boot(data.user)}}const mf=$('managerAuthForm');if(mf)mf.onsubmit=async e=>{e.preventDefault();const email=$('managerEmail').value.trim().toLowerCase(),password=$('managerPassword').value||'';if(!email||!password)return authMsg('أدخل بيانات المدير.',true);const {data,error}=await db.auth.signInWithPassword({email,password});if(error)return authMsg(error.message,true);const {data:profile}=await db.from('profiles').select('role').eq('id',data.user.id).maybeSingle();if(profile?.role!=='project_manager'&&profile?.role!=='admin'){await db.auth.signOut();return authMsg('هذا الحساب ليس حساب إدارة.',true)}await boot(data.user)}$('managerLoginToggle').onclick=()=>{$('managerAuthForm').classList.toggle('hidden');$('authForm').classList.toggle('hidden')}}\n"""
+          if marker in s and 'function setupAuth()' not in s: s=s.replace(marker,auth+marker,1)
+          s=s.replace("init();","setupAuth();init();",1)
+          p.write_text(s)
+          PY
+      - name: Commit patched app
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix direct email password login and export mapping"
+          git push
+      - name: Remove patch workflow
+        run: |
+          git rm .github/workflows/fix-auth-export.yml
+          git commit -m "Remove temporary patch workflow"
+          git push
