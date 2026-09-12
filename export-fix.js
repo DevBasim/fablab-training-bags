@@ -14,7 +14,7 @@
     setInterval(silentSave,5000);
   };
   const clean=s=>String(s??'').replace(/\s+/g,' ').trim();
-  const valueOf=c=>{if(!c)return '';if(c.tagName==='SELECT')return Array.from(c.selectedOptions).map(o=>clean(o.textContent)).join(', ');if(c.type==='checkbox')return c.checked?'نعم':'لا';if(c.type==='file')return c.files?.[0]?.name||'';return c.value??'';};
+  const valueOf=c=>{if(!c)return '';if(c.tagName==='SELECT')return Array.from(c.selectedOptions).map(o=>clean(o.textContent)).join(', ');if(c.type==='checkbox')return c.checked?'نعم':'';if(c.type==='file')return c.files?.[0]?.name||'';return c.value??'';};
   const labelTitle=label=>{const clone=label.cloneNode(true);clone.querySelectorAll('input,textarea,select,button').forEach(x=>x.remove());return clean(clone.textContent);};
   const exportWorkbook=()=>{
     try{
@@ -32,9 +32,13 @@
           rows.push([`${title} ${i+1}`]);
           Object.entries(item||{}).forEach(([key,val])=>{
             if(['id','bag_id','created_at','updated_at'].includes(key))return;
+            if(key==='is_ready'){
+              if(val===true)rows.push(['الجاهزية','نعم']);
+              return;
+            }
             if(key==='measurement'&&val&&typeof val==='object'){Object.entries(val).forEach(([mk,mv])=>{if(clean(mv))rows.push([mk,clean(mv)]);});return;}
             if(Array.isArray(val)){if(val.length)rows.push([key,val.map(x=>typeof x==='object'?JSON.stringify(x):x).join(', ')]);return;}
-            if(val!==null&&val!==undefined&&clean(val)!=='')rows.push([key,typeof val==='object'?JSON.stringify(val):String(val)]);
+            if(val!==null&&val!==undefined&&val!==false&&clean(val)!=='')rows.push([key,typeof val==='object'?JSON.stringify(val):String(val)]);
           });
           rows.push([]);
         });
@@ -48,7 +52,7 @@
       if(attachmentEntries.length){rows.push([],['المرفقات']);attachmentEntries.forEach(([key,f])=>rows.push([key,f?.name||String(f)]));}
       const ws=XLSX.utils.aoa_to_sheet(rows);
       ws['!cols']=[{wch:42},{wch:75}];ws['!rtl']=true;
-      Object.keys(ws).forEach(k=>{if(k[0]!=='!')ws[k].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'}};});
+      Object.keys(ws).forEach(k=>{if(k[0]!=='!')ws[k].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'};});
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');
       const safeName=clean($('f_name')?.value||'الحقيبة التدريبية').replace(/[\\/:*?"<>|]/g,'-').slice(0,80);
       const data=XLSX.write(wb,{bookType:'xlsx',type:'array'});
