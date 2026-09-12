@@ -4,7 +4,7 @@
 @media (max-width:900px){
   html body .app-shell .sidebar .sidebar-bottom{position:absolute!important;left:8px!important;right:auto!important;top:7px!important;width:92px!important;height:54px!important;margin:0!important;padding:0!important;border:0!important;display:block!important;}
   html body .app-shell .sidebar .sidebar-bottom span{display:none!important;}
-  html body .app-shell .sidebar #logoutBtn.logout{position:static!important;width:92px!important;height:54px!important;border:0!important;border-radius:12px!important;background:#202a3c!important;color:#fff!important;font-size:0!important;font-weight:800!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;}
+  html body .app-shell .sidebar #logoutBtn.logout{position:static!important;width:92px!important;height:54px!important;border:1px solid #f87171!important;border-radius:12px!important;background:#7f1d1d!important;color:#fff!important;font-size:0!important;font-weight:800!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;box-shadow:none!important;}
   html body .app-shell .sidebar #logoutBtn.logout:before{content:'تسجيل الخروج'!important;font-size:10px!important;line-height:1!important;color:#fff!important;display:block!important;}
   html body .app-shell .sidebar #logoutBtn.logout:after{content:none!important;display:none!important;}
   html body .app-shell .sidebar nav{width:calc(100% - 104px)!important;flex:0 0 calc(100% - 104px)!important;}
