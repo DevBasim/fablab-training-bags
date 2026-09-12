@@ -108,8 +108,7 @@ async function exportExcel(){
     const pd=formData();
     set('A5',$('f_department')?.selectedOptions?.[0]?.text||'');
     Object.entries(f).forEach(([k,c])=>set(c,k==='supporting_fields'?pd[k].join(', '):pd[k]));
-    set('A12',state.objectives.map((o,i)=>`${i+1}. ${o.text}`).join('
-'));
+    set('A12',state.objectives.map((o,i)=>String(i+1)+'. '+o.text).join(String.fromCharCode(10)));
     set('A15',`${pd.duration_days??''} يوم / ${pd.duration_hours??''} ساعة`);
     set('A16',`${pd.age_min??''} - ${pd.age_max??''}`);
     state.outputs.forEach((o,i)=>{const r=30+i;set(`F${r}`,o.output_no);set(`E${r}`,o.name);set(`D${r}`,o.output_type);set(`C${r}`,o.description);set(`B${r}`,o.quantity);set(`A${r}`,o.ownership)});
