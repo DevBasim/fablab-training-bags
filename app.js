@@ -94,9 +94,10 @@ async function exportExcel(){
   const status=$('exportStatus');status.textContent='جاري تجهيز ملف Excel...';
   try{
     let buf=null;
-    for(const url of ['/template.xlsx','assets/training-bag-template.xlsx']){
-      const r=await fetch(url+'?v=20260912-6',{cache:'no-store'});
-      if(r.ok){buf=await r.arrayBuffer();break;}
+    const r=await fetch('assets/training-bag-template.xlsx?v=20260912-8',{cache:'no-store'});
+    if(r.ok){
+      const type=(r.headers.get('content-type')||'').toLowerCase();
+      if(!type.includes('text/html')) buf=await r.arrayBuffer();
     }
     if(!buf)throw new Error('تعذر تحميل قالب Excel الأصلي. لم يتم إنشاء ملف بديل.');
     const wb=XLSX.read(buf,{type:'array',cellStyles:true,cellNF:true,cellHTML:true});
