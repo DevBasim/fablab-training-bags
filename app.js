@@ -33,7 +33,50 @@ function fillForm(d){const dep=$('f_department');if(dep)dep.value=d.department_i
 function clearForm(){const dep=$('f_department');if(dep)dep.value=localStorage.getItem('selectedDepartmentId')||'';['f_name','f_description','f_program_type','f_primary_field','f_supporting_fields','f_devices_software','f_level','f_practical','f_target','f_split','f_requirements','f_author','f_version','f_days','f_hours','f_age_min','f_age_max','f_participants','f_consumables','f_setup','f_other','reviewComment'].forEach(id=>$(id).value='');$('reviewStatus').value='draft'}
 function updateProgress(){let total=0,done=0;const req=['f_name','f_description','f_program_type','f_primary_field','f_devices_software','f_level','f_practical','f_days','f_hours','f_age_min','f_age_max','f_target','f_participants','f_author'];req.forEach(id=>{total++;if($(id).value.trim())done++});total+=3;if(state.objectives.length)done++;if(state.outputs.some(o=>o.name.trim()))done++;if(state.days.length)done++;total+=3;if(state.human.length)done++;if(state.material.length)done++;if(state.readiness.some(r=>r.is_ready||r.preparation_requirements.trim()))done++;const pct=Math.round(done/total*100);$('editorProgress').textContent=pct+'%';$('progressFill').style.width=pct+'%'}
 document.addEventListener('input',e=>{if(e.target.closest('#page-editor'))updateProgress()});
-function setupAuth(){const form=$('authForm');if(form&&!$('password')){const label=document.createElement('label');label.innerHTML='كلمة المرور<input id="password" type="password" required placeholder="كلمة المرور" autocomplete="current-password">';form.insertBefore(label,form.querySelector('button'));}if(form){form.onsubmit=async e=>{e.preventDefault();const email=$('email').value.trim().toLowerCase(),password=$('password')?.value||'';if(!email||!password)return authMsg('أدخل البريد الإلكتروني وكلمة المرور.',true);$('authSubmit').disabled=true;authMsg('جاري تسجيل الدخول...');const {data,error}=await db.auth.signInWithPassword({email,password});$('authSubmit').disabled=false;if(error)return authMsg(error.message,true);localStorage.setItem('loginEmail',email);await boot(data.user)}}const mf=$('managerAuthForm');if(mf)mf.onsubmit=async e=>{e.preventDefault();const email=$('managerEmail').value.trim().toLowerCase(),password=$('managerPassword').value||'';if(!email||!password)return authMsg('أدخل بيانات المدير.',true);const {data,error}=await db.auth.signInWithPassword({email,password});if(error)return authMsg(error.message,true);const {data:profile}=await db.from('profiles').select('role').eq('id',data.user.id).maybeSingle();if(profile?.role!=='project_manager'&&profile?.role!=='admin'){await db.auth.signOut();return authMsg('هذا الحساب ليس حساب إدارة.',true)}await boot(data.user)}if($('managerLoginToggle'))$('managerLoginToggle').onclick=()=>{$('managerAuthForm').classList.toggle('hidden');$('authForm').classList.toggle('hidden')}}
+function setupAuth(){
+  const form=$("authForm");
+  if(form){
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      const email=$("email")?.value.trim().toLowerCase()||"";
+      const password=$("password")?.value||"";
+      if(!email||!password){authMsg("أدخل البريد الإلكتروني وكلمة المرور.",true);return}
+      $("authSubmit").disabled=true;
+      authMsg("جاري تسجيل الدخول...");
+      const {data,error}=await db.auth.signInWithPassword({email,password});
+      $("authSubmit").disabled=false;
+      if(error){authMsg(error.message,true);return}
+      localStorage.setItem("loginEmail",email);
+      await boot(data.user);
+    };
+  }
+  const managerForm=$("managerAuthForm");
+  if(managerForm){
+    managerForm.onsubmit=async e=>{
+      e.preventDefault();
+      const email=$("managerEmail")?.value.trim().toLowerCase()||"";
+      const password=$("managerPassword")?.value||"";
+      if(!email||!password){authMsg("أدخل بيانات المدير.",true);return}
+      const {data,error}=await db.auth.signInWithPassword({email,password});
+      if(error){authMsg(error.message,true);return}
+      const {data:profile}=await db.from("profiles").select("role").eq("id",data.user.id).maybeSingle();
+      if(profile?.role!=="project_manager"&&profile?.role!=="admin"){
+        await db.auth.signOut();
+        authMsg("هذا الحساب ليس حساب إدارة.",true);
+        return;
+      }
+      await boot(data.user);
+    };
+  }
+  const managerToggle=$("managerLoginToggle");
+  if(managerToggle){
+    managerToggle.onclick=()=>{
+      $("managerAuthForm")?.classList.toggle("hidden");
+      $("authForm")?.classList.toggle("hidden");
+    };
+  }
+}
+
 async function init(){db=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_KEY);const {data}=await db.auth.getSession();if(data.session)await boot(data.session.user)}
 $('logoutBtn').onclick=async()=>{await db.auth.signOut();location.reload()};
 async function boot(user){currentUser=user;$('authView').classList.add('hidden');$('appView').classList.remove('hidden');$('userName').textContent=user.email||'المستخدم';await ensureProfile(user);await loadDepartments();await loadBags();setPage('dashboard')}
