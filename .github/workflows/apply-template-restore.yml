@@ -1,0 +1,26 @@
+name: Apply template restore
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore binary template
+        run: |
+          python - <<'PY'
+          import re,base64
+          from pathlib import Path
+          s=Path('.github/workflows/restore-original-template.yml').read_text()
+          b64=re.search(r"TEMPLATE_B64: '([^']+)'",s,re.S).group(1)
+          Path('assets/training-bag-template.xlsx').write_bytes(base64.b64decode(b64))
+          PY
+          unzip -t assets/training-bag-template.xlsx
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/training-bag-template.xlsx
+          git commit -m 'Apply original Excel template bytes'
+          git push
