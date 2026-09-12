@@ -51,8 +51,9 @@
       const attachmentEntries=Object.entries(appState.attachments||{}).filter(([,f])=>f);
       if(attachmentEntries.length){rows.push([],['المرفقات']);attachmentEntries.forEach(([key,f])=>rows.push([key,f?.name||String(f)]));}
       const ws=XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols']=[{wch:42},{wch:75}];ws['!rtl']=true;
-      Object.keys(ws).forEach(k=>{if(k[0]!=='!')ws[k].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'};});
+      ws['!cols']=[{wch:42},{wch:75}];
+      ws['!rtl']=true;
+      Object.keys(ws).forEach(k=>{if(k[0]!=='!')ws[k].s={alignment:{wrapText:true,vertical:'top',horizontal:'right'}};});
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');
       const safeName=clean($('f_name')?.value||'الحقيبة التدريبية').replace(/[\\/:*?"<>|]/g,'-').slice(0,80);
       const data=XLSX.write(wb,{bookType:'xlsx',type:'array'});
