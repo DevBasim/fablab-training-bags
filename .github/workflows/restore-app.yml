@@ -1,0 +1,28 @@
+name: Restore tested app
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore tested app source
+        run: |
+          git cat-file -p 5d98913e85776d47fef7191ab1d70a69c3862bff > app.js
+          sed -i "s#fetch('template.xlsx')#fetch('assets/training-bag-template.xlsx')#" app.js
+      - name: Commit restored app
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.js
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: restore self-contained app [skip ci]'
+          git push
