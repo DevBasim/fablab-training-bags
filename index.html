@@ -1,163 +1,47 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>نظام الحقائب التدريبية | فاب لاب الأحساء</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>نظام الحقائب التدريبية | فاب لاب الأحساء</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head>
 <body>
 <div id="toast" class="toast"></div>
-<section id="authView" class="auth-shell">
-  <div class="auth-card">
-    <div class="brand-mark">FL</div><span class="eyebrow">فاب لاب الأحساء</span>
-    <h1>نظام الحقائب التدريبية</h1><p class="muted">أنشئ الحقيبة، احفظ تقدمك، وأكملها في أي وقت.</p>
-    <form id="authForm">
-      <label>البريد الإلكتروني<input id="email" type="email" required placeholder="name@fablab.sa"></label>
-      <label>كلمة المرور<input id="password" type="password" minlength="6" required placeholder="••••••••"></label>
-      <button class="primary wide" id="authSubmit">تسجيل الدخول</button>
-    </form>
-    <button class="link-btn" id="toggleAuth">ليس لديك حساب؟ إنشاء حساب</button><div id="authMessage" class="form-message"></div>
-  </div>
-</section>
-<section id="appView" class="app-shell hidden">
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="brand-mark small">FL</div><div><strong>فاب لاب</strong><span>الحقائب التدريبية</span></div></div>
-  <nav>
-    <button class="nav-item active" data-page="dashboard">الرئيسية</button>
-    <button class="nav-item" data-page="bags">حقائبي</button>
-    <button class="nav-item" data-page="editor">محرر الحقيبة</button>
-    <button class="nav-item manager-only hidden" data-page="manager">إدارة الحقائب</button>
-  </nav>
-  <div class="sidebar-bottom"><span id="userName">المستخدم</span><button id="logoutBtn" class="logout">تسجيل الخروج</button></div>
-</aside>
-<main class="main-content">
-<header class="topbar"><div><span class="eyebrow">نظام إدارة المحتوى التدريبي</span><h2 id="pageTitle">الرئيسية</h2></div><button class="primary" id="newBagTop">+ حقيبة جديدة</button></header>
-<div id="page-dashboard" class="page">
-  <div class="hero"><div><span>مرحباً بك 👋</span><h3>خلّ إنجاز الحقيبة أسهل من Excel</h3><p>قسّم العمل إلى خطوات واضحة، احفظ كل تعديل، وتابع نسبة الإنجاز حتى تكتمل الحقيبة.</p><button class="primary" id="startBag">ابدأ حقيبة جديدة</button></div><div class="hero-stat"><strong id="bagCount">0</strong><span>حقيبة محفوظة</span></div></div>
-  <div class="stats-grid"><div class="stat-card"><span>المسودات</span><strong id="draftCount">0</strong></div><div class="stat-card"><span>قيد المراجعة</span><strong id="reviewCount">0</strong></div><div class="stat-card"><span>مكتملة</span><strong id="doneCount">0</strong></div><div class="stat-card"><span>متوسط الإنجاز</span><strong id="avgProgress">0%</strong></div></div>
-  <div class="section-card"><div class="section-head"><div><h3>آخر الحقائب</h3><p>آخر الحقائب التي أنشأتها أو عدّلتها.</p></div><button class="text-btn" data-page-jump="bags">عرض الكل</button></div><div id="recentBags" class="bag-list empty">لا توجد حقائب حتى الآن.</div></div>
-</div>
+<section id="authView" class="auth-shell"><div class="auth-card"><div class="brand-mark">FL</div><span class="eyebrow">فاب لاب الأحساء</span><h1>نظام الحقائب التدريبية</h1><p class="muted">أنشئ الحقيبة، احفظ تقدمك، وأكملها في أي وقت.</p><form id="authForm"><label>البريد الإلكتروني<input id="email" type="email" required placeholder="name@fablab.sa"></label><label>كلمة المرور<input id="password" type="password" minlength="6" required placeholder="••••••••"></label><button class="primary wide" id="authSubmit">تسجيل الدخول</button></form><button class="link-btn" id="toggleAuth">ليس لديك حساب؟ إنشاء حساب</button><div id="authMessage" class="form-message"></div></div></section>
+<section id="appView" class="app-shell hidden"><aside class="sidebar"><div class="sidebar-brand"><div class="brand-mark small">FL</div><div><strong>فاب لاب</strong><span>الحقائب التدريبية</span></div></div><nav><button class="nav-item active" data-page="dashboard">الرئيسية</button><button class="nav-item" data-page="bags">حقائبي</button><button class="nav-item" data-page="editor">محرر الحقيبة</button><button class="nav-item manager-only hidden" data-page="manager">إدارة الحقائب</button></nav><div class="sidebar-bottom"><span id="userName">المستخدم</span><button id="logoutBtn" class="logout">تسجيل الخروج</button></div></aside>
+<main class="main-content"><header class="topbar"><div><span class="eyebrow">نظام إدارة المحتوى التدريبي</span><h2 id="pageTitle">الرئيسية</h2></div><button class="primary" id="newBagTop">+ حقيبة جديدة</button></header>
+<div id="page-dashboard" class="page"><div class="hero"><div><span>مرحباً بك 👋</span><h3>خلّ إنجاز الحقيبة أسهل من Excel</h3><p>قسّم العمل إلى خطوات واضحة، احفظ كل تعديل، وتابع نسبة الإنجاز حتى تكتمل الحقيبة.</p><button class="primary" id="startBag">ابدأ حقيبة جديدة</button></div><div class="hero-stat"><strong id="bagCount">0</strong><span>حقيبة محفوظة</span></div></div><div class="stats-grid"><div class="stat-card"><span>المسودات</span><strong id="draftCount">0</strong></div><div class="stat-card"><span>قيد المراجعة</span><strong id="reviewCount">0</strong></div><div class="stat-card"><span>مكتملة</span><strong id="doneCount">0</strong></div><div class="stat-card"><span>متوسط الإنجاز</span><strong id="avgProgress">0%</strong></div></div><div class="section-card"><div class="section-head"><div><h3>آخر الحقائب</h3><p>آخر الحقائب التي أنشأتها أو عدّلتها.</p></div><button class="text-btn" data-page-jump="bags">عرض الكل</button></div><div id="recentBags" class="bag-list empty">لا توجد حقائب حتى الآن.</div></div></div>
 <div id="page-bags" class="page hidden"><div class="section-card"><div class="section-head"><div><h3>حقائبي</h3><p>يمكنك فتح أي حقيبة والمتابعة من آخر قسم وصلت إليه.</p></div><button class="primary" id="newBagList">+ إنشاء حقيبة</button></div><div id="allBags" class="bag-list empty">جاري التحميل...</div></div></div>
 <div id="page-manager" class="page hidden"><div class="section-card"><div class="section-head"><div><h3>إدارة الحقائب</h3><p>عرض ومتابعة جميع الحقائب.</p></div></div><div id="managerBags" class="bag-list empty">جاري التحميل...</div></div></div>
-<div id="page-editor" class="page hidden">
-  <div class="editor-head section-card">
-    <div><span class="eyebrow" id="editorMode">حقيبة جديدة</span><h3 id="editorTitle">بيانات الحقيبة</h3><p id="editorSubtitle">يمكنك الحفظ والعودة لاحقاً بدون فقدان البيانات.</p></div>
-    <div class="editor-actions"><span class="progress-pill" id="editorProgress">0%</span><button class="secondary" id="backToBags">رجوع</button><button class="primary" id="saveBag">حفظ الحقيبة</button></div>
-  </div>
-  <div class="progress-bar"><span id="progressFill"></span></div>
-  <div class="editor-layout">
-    <aside class="section-nav" id="sectionNav">
-      <button class="section-tab active" data-section="program"><b>1</b><span>بطاقة البرنامج</span></button>
-      <button class="section-tab" data-section="outputs"><b>2</b><span>المخرجات والأهداف</span></button>
-      <button class="section-tab" data-section="plan"><b>3</b><span>خطة التنفيذ</span></button>
-      <button class="section-tab" data-section="resources"><b>4</b><span>الاحتياجات والموارد</span></button>
-      <button class="section-tab" data-section="readiness"><b>5</b><span>الجاهزية</span></button>
-      <button class="section-tab" data-section="attachments"><b>6</b><span>المرفقات والمراجعة</span></button>
-      <button class="section-tab" data-section="export"><b>7</b><span>التصدير</span></button>
-    </aside>
-    <div class="editor-body">
-      <section class="editor-section active" data-section-panel="program">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 1</span><h3>بطاقة البرنامج التدريبي</h3></div></div>
-          <div class="form-grid">
-            <label>اسم البرنامج التدريبي<input id="f_name" placeholder="الاسم الرسمي المختصر"></label>
-            <label>نوع البرنامج<select id="f_program_type"><option value="">اختر</option><option>قصير</option><option>ممتد</option><option>معسكر</option><option>سلسلة تدريبية</option></select></label>
-            <label class="full">وصف البرنامج التدريبي<textarea id="f_description" rows="3"></textarea></label>
-            <label>المجال الأساسي<input id="f_primary_field"></label>
-            <label>المجالات المساندة<input id="f_supporting_fields" placeholder="افصل بين المجالات بفاصلة"></label>
-            <label class="full">الأجهزة والبرامج<textarea id="f_devices_software" rows="2"></textarea></label>
-            <label class="full">أهداف البرنامج <span class="hint">اكتب هدفاً ثم أضفه للقائمة</span><div class="inline-add"><input id="objectiveInput" placeholder="مثال: أن يصمم المشارك نموذجاً عملياً"><button type="button" class="secondary" id="addObjective">+ إضافة</button></div></label>
-            <div class="full"><div id="objectivesList" class="repeat-list"></div></div>
-            <label>المستوى<select id="f_level"><option value="">اختر</option><option>تأسيسي</option><option>متوسط</option><option>متقدم</option></select></label>
-            <label>نوع التطبيق العملي<select id="f_practical"><option value="">اختر</option><option>فردي</option><option>جماعي</option><option>فردي وجماعي</option></select></label>
-            <label>عدد الأيام<input id="f_days" type="number" min="0"></label><label>إجمالي الساعات<input id="f_hours" type="number" min="0" step="0.5"></label>
-            <label>العمر الأدنى<input id="f_age_min" type="number" min="0"></label><label>العمر الأعلى<input id="f_age_max" type="number" min="0"></label>
-            <label class="full">الفئة المستهدفة<input id="f_target"></label>
-            <label>عدد المشاركين<input id="f_participants" type="number" min="0"></label>
-            <label>تقسيم المشاركين<input id="f_split" placeholder="مثال: 3 مجموعات × 8"></label>
-            <label class="full">شروط الالتحاق<textarea id="f_requirements" rows="2"></textarea></label>
-            <label>مُعدّ المحتوى العلمي<input id="f_author"></label><label>رقم الإصدار وتاريخ التحديث<input id="f_version" placeholder="مثال: 1.0 - 2026/09/12"></label>
-            <label>تكلفة المستهلكات<input id="f_consumables" type="number" min="0" step="0.01"></label><label>تكلفة تأسيسية غير متكررة<input id="f_setup" type="number" min="0" step="0.01"></label>
-            <label class="full">اعتبارات أخرى<textarea id="f_other" rows="2"></textarea></label>
-          </div>
-        </div>
-      </section>
-      <section class="editor-section" data-section-panel="outputs">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 2</span><h3>مخرجات البرنامج وتسليماته</h3><p>حتى 5 مخرجات مثل القالب الأصلي.</p></div><button class="secondary" type="button" id="addOutput">+ إضافة مخرج</button></div><div id="outputsList" class="repeat-list"></div></div>
-      </section>
-      <section class="editor-section" data-section-panel="plan">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 3</span><h3>خطة تنفيذ البرنامج</h3></div><button class="secondary" type="button" id="addDay">+ إضافة يوم</button></div><div id="daysList" class="repeat-list"></div></div>
-      </section>
-      <section class="editor-section" data-section-panel="resources">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 4</span><h3>الاحتياجات والموارد</h3></div></div>
-          <h4>الموارد البشرية</h4><div id="humanList" class="repeat-list"></div><button class="secondary" type="button" id="addHuman">+ إضافة مورد بشري</button>
-          <hr><h4>الاحتياجات المادية والتقنية</h4><div id="materialList" class="repeat-list"></div><button class="secondary" type="button" id="addMaterial">+ إضافة احتياج</button>
-        </div>
-      </section>
-      <section class="editor-section" data-section-panel="readiness">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">متطلبات الجاهزية قبل التنفيذ</span><h3>ماذا يجب تجهيزه قبل بداية البرنامج؟</h3></div></div><div id="readinessList" class="readiness-grid"></div></div>
-      </section>
-      <section class="editor-section" data-section-panel="attachments">
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 6</span><h3>مرفقات الحقيبة</h3><p>ارفع الملفات التي يحتاجها المدرب لتنفيذ البرنامج.</p></div></div><div id="attachmentList" class="attachment-grid"></div></div>
-        <div class="section-card"><div class="section-title"><div><span class="eyebrow">المراجعة العلمية والاعتماد</span><h3>حالة المراجعة</h3></div></div><div class="review-box"><select id="reviewStatus"><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="completed">مكتملة</option></select><textarea id="reviewComment" rows="3" placeholder="ملاحظات المراجعة أو الاعتماد"></textarea></div></div>
-      </section>
-      <section class="editor-section" data-section-panel="export">
-        <div class="section-card export-card"><span class="eyebrow">القسم 7</span><h3>التصدير إلى Excel</h3><p>سيتم تعبئة قالب الحقيبة الأصلي في مواضعه المحددة، مع إبقاء التصميم كما هو.</p><div class="export-status" id="exportStatus">احفظ الحقيبة أولاً ثم صدّرها.</div><button class="primary" id="exportExcel">تصدير الحقيبة إلى Excel</button></div>
-      </section>
-    </div>
-  </div>
-</div>
+<div id="page-editor" class="page hidden"><div class="editor-head section-card"><div><span class="eyebrow" id="editorMode">حقيبة جديدة</span><h3 id="editorTitle">بيانات الحقيبة</h3><p id="editorSubtitle">يمكنك الحفظ والعودة لاحقاً بدون فقدان البيانات.</p></div><div class="editor-actions"><span class="progress-pill" id="editorProgress">0%</span><button class="secondary" id="backToBags">رجوع</button><button class="primary" id="saveBag">حفظ الحقيبة</button></div></div><div class="progress-bar"><span id="progressFill"></span></div><div class="editor-layout"><aside class="section-nav" id="sectionNav"><button class="section-tab active" data-section="program"><b>1</b><span>بطاقة البرنامج</span></button><button class="section-tab" data-section="outputs"><b>2</b><span>المخرجات والأهداف</span></button><button class="section-tab" data-section="plan"><b>3</b><span>خطة التنفيذ</span></button><button class="section-tab" data-section="resources"><b>4</b><span>الاحتياجات والموارد</span></button><button class="section-tab" data-section="readiness"><b>5</b><span>الجاهزية</span></button><button class="section-tab" data-section="attachments"><b>6</b><span>المرفقات والمراجعة</span></button><button class="section-tab" data-section="export"><b>7</b><span>التصدير</span></button></aside><div class="editor-body">
+<section class="editor-section active" data-section-panel="program"><div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 1</span><h3>بطاقة البرنامج التدريبي</h3></div></div><div class="form-grid"><label>اسم البرنامج التدريبي<input id="f_name" placeholder="الاسم الرسمي المختصر"></label><label>نوع البرنامج<select id="f_program_type"><option value="">اختر</option><option>قصير</option><option>ممتد</option><option>معسكر</option><option>سلسلة تدريبية</option></select></label><label class="full">وصف البرنامج التدريبي<textarea id="f_description" rows="3"></textarea></label><label>المجال الأساسي<input id="f_primary_field"></label><label>المجالات المساندة<input id="f_supporting_fields" placeholder="افصل بين المجالات بفاصلة"></label><label class="full">الأجهزة والبرامج<textarea id="f_devices_software" rows="2"></textarea></label><label class="full">أهداف البرنامج <span class="hint">اكتب هدفاً ثم أضفه للقائمة</span><div class="inline-add"><input id="objectiveInput" placeholder="مثال: أن يصمم المشارك نموذجاً عملياً"><button type="button" class="secondary" id="addObjective">+ إضافة</button></div></label><div class="full"><div id="objectivesList" class="repeat-list"></div></div><label>المستوى<select id="f_level"><option value="">اختر</option><option>تأسيسي</option><option>متوسط</option><option>متقدم</option></select></label><label>نوع التطبيق العملي<select id="f_practical"><option value="">اختر</option><option>فردي</option><option>جماعي</option><option>فردي وجماعي</option></select></label><label>عدد الأيام<input id="f_days" type="number" min="0"></label><label>إجمالي الساعات<input id="f_hours" type="number" min="0" step="0.5"></label><label>العمر الأدنى<input id="f_age_min" type="number" min="0"></label><label>العمر الأعلى<input id="f_age_max" type="number" min="0"></label><label class="full">الفئة المستهدفة<input id="f_target"></label><label>عدد المشاركين<input id="f_participants" type="number" min="0"></label><label>تقسيم المشاركين<input id="f_split" placeholder="مثال: 3 مجموعات × 8"></label><label class="full">شروط الالتحاق<textarea id="f_requirements" rows="2"></textarea></label><label>مُعدّ المحتوى العلمي<input id="f_author"></label><label>رقم الإصدار وتاريخ التحديث<input id="f_version" placeholder="مثال: 1.0 - 2026/09/12"></label><label>تكلفة المستهلكات<input id="f_consumables" type="number" min="0" step="0.01"></label><label>تكلفة تأسيسية غير متكررة<input id="f_setup" type="number" min="0" step="0.01"></label><label class="full">اعتبارات أخرى<textarea id="f_other" rows="2"></textarea></label></div></div></section>
+<section class="editor-section" data-section-panel="outputs"><div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 2</span><h3>مخرجات البرنامج وتسليماته</h3><p>حتى 5 مخرجات مثل القالب الأصلي.</p></div><button class="secondary" type="button" id="addOutput">+ إضافة مخرج</button></div><div id="outputsList" class="repeat-list"></div></div></section>
+<section class="editor-section" data-section-panel="plan"><div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 3</span><h3>خطة تنفيذ البرنامج</h3></div><button class="secondary" type="button" id="addDay">+ إضافة يوم</button></div><div id="daysList" class="repeat-list"></div></div></section>
+<section class="editor-section" data-section-panel="resources"><div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 4</span><h3>الاحتياجات والموارد</h3></div></div><h4>الموارد البشرية</h4><div id="humanList" class="repeat-list"></div><button class="secondary" type="button" id="addHuman">+ إضافة مورد بشري</button><hr><h4>الاحتياجات المادية والتقنية</h4><div id="materialList" class="repeat-list"></div><button class="secondary" type="button" id="addMaterial">+ إضافة احتياج</button></div></section>
+<section class="editor-section" data-section-panel="readiness"><div class="section-card"><div class="section-title"><div><span class="eyebrow">متطلبات الجاهزية قبل التنفيذ</span><h3>ماذا يجب تجهيزه قبل بداية البرنامج؟</h3></div></div><div id="readinessList" class="readiness-grid"></div></div></section>
+<section class="editor-section" data-section-panel="attachments"><div class="section-card"><div class="section-title"><div><span class="eyebrow">القسم 6</span><h3>مرفقات الحقيبة</h3><p>ارفع الملفات التي يحتاجها المدرب لتنفيذ البرنامج.</p></div></div><div id="attachmentList" class="attachment-grid"></div></div><div class="section-card"><div class="section-title"><div><span class="eyebrow">المراجعة العلمية والاعتماد</span><h3>حالة المراجعة</h3></div></div><div class="review-box"><select id="reviewStatus"><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="completed">مكتملة</option></select><textarea id="reviewComment" rows="3" placeholder="ملاحظات المراجعة أو الاعتماد"></textarea></div></div></section>
+<section class="editor-section" data-section-panel="export"><div class="section-card export-card"><span class="eyebrow">القسم 7</span><h3>التصدير إلى Excel</h3><p>سيتم تعبئة قالب الحقيبة الأصلي في مواضعه المحددة، مع إبقاء التصميم كما هو.</p><div class="export-status" id="exportStatus">احفظ الحقيبة أولاً ثم صدّرها.</div><button class="primary" id="exportExcel">تصدير الحقيبة إلى Excel</button></div></section>
+</div></div></div></div>
 </main></section>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="app.js"></script>
 <script>
 (function(){
-  function fallbackExport(){
-    if(!window.currentBagId)return;
-    const status=document.getElementById('exportStatus');
-    try{
-      const wb=XLSX.utils.book_new(), rows=[];
-      const add=(r,c,v)=>{if(!rows[r])rows[r]=[];rows[r][c]=v??''};
-      add(0,0,'قالب الحقيبة التدريبية - فاب لاب الأحساء');
-      add(3,0,'1. بطاقة البرنامج التدريبي');
-      const get=id=>document.getElementById(id)?.value||'';
-      const fields=[['اسم البرنامج التدريبي',get('f_name')],['وصف البرنامج التدريبي',get('f_description')],['نوع البرنامج',get('f_program_type')],['المجال الأساسي',get('f_primary_field')],['المجالات المساندة',get('f_supporting_fields')],['الأجهزة والبرامج',get('f_devices_software')],['أهداف البرنامج',(window.state?.objectives||[]).map((o,i)=>(i+1)+'. '+o.text).join('\n')]];
-      fields.forEach((x,i)=>{add(5+i,5,x[0]);add(5+i,0,x[1])});
-      add(12,0,'المستوى');add(12,1,get('f_level'));add(13,0,'نوع التطبيق العملي');add(13,1,get('f_practical'));add(14,0,'المدة بالأيام');add(14,1,get('f_days'));add(15,0,'العمر');add(15,1,get('f_age_min')+' - '+get('f_age_max'));
-      add(26,0,'2. مخرجات البرنامج وتسليماته');add(28,0,'رقم');add(28,1,'اسم المخرج');add(28,2,'النوع');add(28,3,'الوصف');add(28,4,'العدد');add(28,5,'الملكية');
-      (window.state?.outputs||[]).forEach((o,i)=>{const r=29+i;add(r,0,o.output_no);add(r,1,o.name);add(r,2,o.output_type);add(r,3,o.description);add(r,4,o.quantity);add(r,5,o.ownership)});
-      add(36,0,'3. خطة تنفيذ البرنامج');add(38,0,'اليوم');add(38,1,'ماذا سنتعلم اليوم؟');add(38,2,'المحاور');add(38,3,'الأهداف المرتبطة');add(38,4,'المخرجات المرتبطة');add(38,5,'التنفيذ والمدة');add(38,6,'التحقق');
-      (window.state?.days||[]).forEach((d,i)=>{const r=39+i;add(r,0,d.day_no);add(r,1,d.what_to_learn);add(r,2,d.topics);add(r,3,(d.objective_ids||[]).join(', '));add(r,4,(d.output_ids||[]).join(', '));add(r,5,d.execution_duration);add(r,6,d.verification)});
-      add(61,0,'4. الاحتياجات والموارد');
-      (window.state?.human||[]).forEach((h,i)=>{const r=63+i;add(r,0,h.resource_type);add(r,1,h.quantity);add(r,2,h.requirements);add(r,3,h.responsibilities)});
-      (window.state?.material||[]).forEach((m,i)=>{const r=69+i;add(r,0,m.item);add(r,1,m.unit);add(r,2,m.specifications);add(r,3,m.quantity_per_person_group);add(r,4,m.total_quantity);add(r,5,m.notes)});
-      add(77,0,'5. متطلبات الجاهزية');(window.state?.readiness||[]).forEach((x,i)=>{const r=78+i;add(r,0,x.category);add(r,1,x.preparation_requirements);add(r,2,x.lead_time);add(r,3,x.is_ready?'جاهز':'غير مكتمل')});
-      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:28},{wch:28},{wch:28},{wch:28},{wch:18},{wch:28},{wch:24}];XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');
-      const out=XLSX.write(wb,{bookType:'xlsx',type:'array'}),blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(get('f_name')||'الحقيبة التدريبية')+'.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status.textContent='تم تصدير ملف Excel بنجاح.';
-    }catch(e){status.textContent='تعذر التصدير: '+e.message;}
-  }
   window.addEventListener('load',function(){
-    const b=document.getElementById('exportExcel');
-    if(!b)return;
+    const b=document.getElementById('exportExcel');if(!b)return;
     b.onclick=async function(){
       const status=document.getElementById('exportStatus');
-      if(!window.currentBagId){if(typeof window.toast==='function')window.toast('احفظ الحقيبة أولاً','error');return;}
+      if(!currentBagId){if(typeof toast==='function')toast('احفظ الحقيبة أولاً','error');return;}
       status.textContent='جاري تجهيز ملف Excel...';
+      const get=id=>document.getElementById(id)?.value||'';
+      const fallback=()=>{
+        const wb=XLSX.utils.book_new(),rows=[],add=(r,c,v)=>{if(!rows[r])rows[r]=[];rows[r][c]=v??''};
+        add(0,0,'قالب الحقيبة التدريبية - فاب لاب الأحساء');add(3,0,'1. بطاقة البرنامج التدريبي');
+        const fields=[['اسم البرنامج التدريبي',get('f_name')],['وصف البرنامج التدريبي',get('f_description')],['نوع البرنامج',get('f_program_type')],['المجال الأساسي',get('f_primary_field')],['المجالات المساندة',get('f_supporting_fields')],['الأجهزة والبرامج',get('f_devices_software')],['أهداف البرنامج',state.objectives.map((o,i)=>(i+1)+'. '+o.text).join('\n')]];fields.forEach((x,i)=>{add(5+i,5,x[0]);add(5+i,0,x[1])});
+        add(12,0,'المستوى');add(12,1,get('f_level'));add(13,0,'نوع التطبيق العملي');add(13,1,get('f_practical'));add(14,0,'المدة بالأيام');add(14,1,get('f_days'));add(15,0,'العمر');add(15,1,get('f_age_min')+' - '+get('f_age_max'));
+        add(26,0,'2. مخرجات البرنامج وتسليماته');add(28,0,'رقم');add(28,1,'اسم المخرج');add(28,2,'النوع');add(28,3,'الوصف');add(28,4,'العدد');add(28,5,'الملكية');state.outputs.forEach((o,i)=>{const r=29+i;add(r,0,o.output_no);add(r,1,o.name);add(r,2,o.output_type);add(r,3,o.description);add(r,4,o.quantity);add(r,5,o.ownership)});
+        add(36,0,'3. خطة تنفيذ البرنامج');add(38,0,'اليوم');add(38,1,'ماذا سنتعلم اليوم؟');add(38,2,'المحاور');add(38,3,'الأهداف المرتبطة');add(38,4,'المخرجات المرتبطة');add(38,5,'التنفيذ والمدة');add(38,6,'التحقق');state.days.forEach((d,i)=>{const r=39+i;add(r,0,d.day_no);add(r,1,d.what_to_learn);add(r,2,d.topics);add(r,3,(d.objective_ids||[]).join(', '));add(r,4,(d.output_ids||[]).join(', '));add(r,5,d.execution_duration);add(r,6,d.verification)});
+        add(61,0,'4. الاحتياجات والموارد');state.human.forEach((h,i)=>{const r=63+i;add(r,0,h.resource_type);add(r,1,h.quantity);add(r,2,h.requirements);add(r,3,h.responsibilities)});state.material.forEach((m,i)=>{const r=69+i;add(r,0,m.item);add(r,1,m.unit);add(r,2,m.specifications);add(r,3,m.quantity_per_person_group);add(r,4,m.total_quantity);add(r,5,m.notes)});add(77,0,'5. متطلبات الجاهزية');state.readiness.forEach((x,i)=>{const r=78+i;add(r,0,x.category);add(r,1,x.preparation_requirements);add(r,2,x.lead_time);add(r,3,x.is_ready?'جاهز':'غير مكتمل')});
+        const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:28},{wch:28},{wch:28},{wch:28},{wch:18},{wch:28},{wch:24}];XLSX.utils.book_append_sheet(wb,ws,'قالب الحقيبة');const out=XLSX.write(wb,{bookType:'xlsx',type:'array'}),blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(get('f_name')||'الحقيبة التدريبية')+'.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status.textContent='تم تصدير ملف Excel بنجاح.';
+      };
       try{
-        const r=await fetch('assets/training-bag-template.xlsx');if(!r.ok)throw new Error('قالب Excel غير موجود');
-        const buf=await r.arrayBuffer(),wb=XLSX.read(buf,{type:'array'});if(!wb.Sheets['قالب الحقيبة'])throw new Error('ورقة القالب غير موجودة');
-        const ws=wb.Sheets['قالب الحقيبة'],get=id=>document.getElementById(id)?.value||'',set=(cell,v)=>{if(v!==null&&v!==undefined&&v!=='')ws[cell]={t:'s',v:String(v)}};
-        set('A1','قالب الحقيبة التدريبية - فاب لاب الأحساء');const pd=typeof formData==='function'?formData():{};
-        const f={description:'F7',program_type:'F8',primary_field:'F9',supporting_fields:'F10',devices_software:'F11',level:'F13',practical_application_type:'F14',duration_days:'F15',target_audience:'F17',participant_count:'F18',participant_split:'F19',admission_requirements:'F20',scientific_content_author:'F21',version:'F22',consumables_cost:'F23',setup_cost:'F24',other_considerations:'F25'};
-        set('F6',get('f_name'));Object.entries(f).forEach(([k,c])=>set(c,k==='supporting_fields'?(pd[k]||[]).join(', '):pd[k]));set('F12',(window.state?.objectives||[]).map((o,i)=>(i+1)+'. '+o.text).join('\n'));set('F16',(pd.age_min??'')+' - '+(pd.age_max??''));
-        (window.state?.outputs||[]).forEach((o,i)=>{const r=30+i;set('F'+r,o.output_no);set('E'+r,o.name);set('D'+r,o.output_type);set('C'+r,o.description);set('B'+r,o.quantity);set('A'+r,o.ownership)});
-        (window.state?.days||[]).forEach((d,i)=>{const r=53+i;set('G'+r,d.day_no);set('F'+r,d.what_to_learn);set('E'+r,d.topics);set('D'+r,(d.objective_ids||[]).map(x=>Number(x)+1).join(', '));set('C'+r,(d.output_ids||[]).join(', '));set('B'+r,d.execution_duration);set('A'+r,d.verification)});
-        const out=XLSX.write(wb,{bookType:'xlsx',type:'array'}),blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(get('f_name')||'الحقيبة التدريبية')+'.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status.textContent='تم تجهيز ملف Excel بنفس القالب.';
-      }catch(e){status.textContent='القالب الحالي غير صالح، تم إنشاء نسخة Excel بديلة.';fallbackExport();}
+        const r=await fetch('assets/training-bag-template.xlsx');if(!r.ok)throw new Error('template');const buf=await r.arrayBuffer(),wb=XLSX.read(buf,{type:'array'});if(!wb.Sheets['قالب الحقيبة'])throw new Error('sheet');const ws=wb.Sheets['قالب الحقيبة'],set=(c,v)=>{if(v!==null&&v!==undefined&&v!=='')ws[c]={t:'s',v:String(v)}};set('A1','قالب الحقيبة التدريبية - فاب لاب الأحساء');const pd=formData();set('F6',get('f_name'));const f={description:'F7',program_type:'F8',primary_field:'F9',supporting_fields:'F10',devices_software:'F11',level:'F13',practical_application_type:'F14',duration_days:'F15',target_audience:'F17',participant_count:'F18',participant_split:'F19',admission_requirements:'F20',scientific_content_author:'F21',version:'F22',consumables_cost:'F23',setup_cost:'F24',other_considerations:'F25'};Object.entries(f).forEach(([k,c])=>set(c,k==='supporting_fields'?(pd[k]||[]).join(', '):pd[k]));set('F12',state.objectives.map((o,i)=>(i+1)+'. '+o.text).join('\n'));set('F16',(pd.age_min??'')+' - '+(pd.age_max??''));state.outputs.forEach((o,i)=>{const r=30+i;set('F'+r,o.output_no);set('E'+r,o.name);set('D'+r,o.output_type);set('C'+r,o.description);set('B'+r,o.quantity);set('A'+r,o.ownership)});state.days.forEach((d,i)=>{const r=53+i;set('G'+r,d.day_no);set('F'+r,d.what_to_learn);set('E'+r,d.topics);set('D'+r,(d.objective_ids||[]).map(x=>Number(x)+1).join(', '));set('C'+r,(d.output_ids||[]).join(', '));set('B'+r,d.execution_duration);set('A'+r,d.verification)});const out=XLSX.write(wb,{bookType:'xlsx',type:'array'}),blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(get('f_name')||'الحقيبة التدريبية')+'.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status.textContent='تم تجهيز ملف Excel بنفس القالب.';
+      }catch(e){status.textContent='القالب غير صالح حالياً، جاري إنشاء ملف Excel بديل...';fallback();}
     };
   });
 })();
