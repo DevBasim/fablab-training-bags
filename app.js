@@ -60,11 +60,7 @@ function setupAuth(){
       const {data,error}=await db.auth.signInWithPassword({email,password});
       if(error){authMsg(error.message,true);return}
       const {data:profile}=await db.from("profiles").select("role").eq("id",data.user.id).maybeSingle();
-      if(profile?.role!=="project_manager"&&profile?.role!=="admin"){
-        await db.auth.signOut();
-        authMsg("هذا الحساب ليس حساب إدارة.",true);
-        return;
-      }
+      if(profile?.role!=="project_manager"&&profile?.role!=="admin"){await db.auth.signOut();authMsg("هذا الحساب ليس حساب إدارة.",true);return}
       await boot(data.user);
     };
   }
@@ -76,12 +72,11 @@ function setupAuth(){
     };
   }
 }
-
 async function init(){db=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_KEY);const {data}=await db.auth.getSession();if(data.session)await boot(data.session.user)}
 $('logoutBtn').onclick=async()=>{await db.auth.signOut();location.reload()};
 async function boot(user){currentUser=user;$('authView').classList.add('hidden');$('appView').classList.remove('hidden');$('userName').textContent=user.email||'المستخدم';await ensureProfile(user);await loadDepartments();await loadBags();setPage('dashboard')}
 async function ensureProfile(user){const {data}=await db.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();if(data?.full_name)$('userName').textContent=data.full_name;if(data?.role==='project_manager')document.querySelector('.manager-only').classList.remove('hidden');if(!data){const email=user.email||user.user_metadata?.email||localStorage.getItem('loginEmail')||'مستخدم';const {error}=await db.from('profiles').insert({id:user.id,full_name:email,role:'staff'});if(!error)$('userName').textContent=email}}
-async function loadDepartments(){const {data,error}=await db.from('departments').select('id,name').eq('is_active',true).order('name');if(error)return;window.departments=data||[]}
+async function loadDepartments(){const {data,error}=await db.from('departments').select('id,name').eq('is_active',true).order('name');if(error){console.error(error);return}window.departments=data||[];const dep=$('f_department');if(dep){dep.innerHTML='<option value="">اختر القسم</option>';window.departments.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.name;dep.appendChild(o)});const saved=localStorage.getItem('selectedDepartmentId');if(saved)dep.value=saved}}
 async function loadBags(){const {data,error}=await db.from('training_bags').select('id,name,status,completion_percent,updated_at,department_id').order('updated_at',{ascending:false});if(error)return;const bags=data||[];renderBags($('allBags'),bags);renderBags($('recentBags'),bags.slice(0,5));$('bagCount').textContent=bags.length;$('draftCount').textContent=bags.filter(b=>b.status==='draft'||b.status==='in_progress').length;$('reviewCount').textContent=bags.filter(b=>b.status==='submitted'||b.status==='needs_revision').length;$('doneCount').textContent=bags.filter(b=>b.status==='approved'||Number(b.completion_percent)>=100).length;$('avgProgress').textContent=(bags.length?Math.round(bags.reduce((s,b)=>s+Number(b.completion_percent||0),0)/bags.length):0)+'%'}
 function renderBags(c,bags){if(!bags.length){c.className='bag-list empty';c.textContent='لا توجد حقائب حتى الآن.';return}c.className='bag-list';c.innerHTML=bags.map(b=>`<div class="bag-row"><div class="bag-info"><strong>${esc(b.name)}</strong><span>آخر تحديث: ${new Intl.DateTimeFormat('ar-SA',{dateStyle:'medium'}).format(new Date(b.updated_at))}</span></div><div class="bag-meta"><span class="badge">${statusText(b.status)}</span><div><div class="progress-mini"><span style="width:${Math.min(100,Number(b.completion_percent||0))}%"></span></div><small>${Math.round(Number(b.completion_percent||0))}%</small></div><button class="secondary" onclick="openBag('${b.id}')">فتح</button></div></div>`).join('')}
 async function loadManagerBags(){const {data,error}=await db.from('training_bags').select('id,name,status,completion_percent,updated_at').order('updated_at',{ascending:false});if(error)return $('managerBags').textContent='تعذر تحميل الحقائب.';renderBags($('managerBags'),data||[])}
