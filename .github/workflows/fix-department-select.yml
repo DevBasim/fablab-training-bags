@@ -2,6 +2,8 @@ name: Fix department select
 on:
   push:
     branches: [main]
+permissions:
+  contents: write
 jobs:
   fix:
     runs-on: ubuntu-latest
