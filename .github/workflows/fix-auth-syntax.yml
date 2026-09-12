@@ -1,0 +1,80 @@
+name: Fix auth syntax
+on:
+  push:
+    branches: [main]
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, 'Fix auth syntax') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace auth block and bump cache
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('app.js')
+          s=p.read_text()
+          new='''function setupAuth(){
+            const form=$("authForm");
+            if(form){
+              form.onsubmit=async e=>{
+                e.preventDefault();
+                const email=$("email")?.value.trim().toLowerCase()||"";
+                const password=$("password")?.value||"";
+                if(!email||!password){authMsg("أدخل البريد الإلكتروني وكلمة المرور.",true);return}
+                $("authSubmit").disabled=true;
+                authMsg("جاري تسجيل الدخول...");
+                const {data,error}=await db.auth.signInWithPassword({email,password});
+                $("authSubmit").disabled=false;
+                if(error){authMsg(error.message,true);return}
+                localStorage.setItem("loginEmail",email);
+                await boot(data.user);
+              };
+            }
+            const managerForm=$("managerAuthForm");
+            if(managerForm){
+              managerForm.onsubmit=async e=>{
+                e.preventDefault();
+                const email=$("managerEmail")?.value.trim().toLowerCase()||"";
+                const password=$("managerPassword")?.value||"";
+                if(!email||!password){authMsg("أدخل بيانات المدير.",true);return}
+                const {data,error}=await db.auth.signInWithPassword({email,password});
+                if(error){authMsg(error.message,true);return}
+                const {data:profile}=await db.from("profiles").select("role").eq("id",data.user.id).maybeSingle();
+                if(profile?.role!=="project_manager"&&profile?.role!=="admin"){
+                  await db.auth.signOut();
+                  authMsg("هذا الحساب ليس حساب إدارة.",true);
+                  return;
+                }
+                await boot(data.user);
+              };
+            }
+            const managerToggle=$("managerLoginToggle");
+            if(managerToggle){
+              managerToggle.onclick=()=>{
+                $("managerAuthForm")?.classList.toggle("hidden");
+                $("authForm")?.classList.toggle("hidden");
+              };
+            }
+          }
+          '''
+          s=re.sub(r'function setupAuth\(\)\{.*?\nasync function init\(\)', new+'\nasync function init()', s, count=1, flags=re.S)
+          p.write_text(s)
+          h=Path('index.html')
+          x=h.read_text().replace('app.js?v=20260912-3','app.js?v=20260912-4')
+          h.write_text(x)
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.js index.html
+          git commit -m 'Fix auth syntax' || true
+          git push
+          rm -f .github/workflows/fix-auth-syntax.yml
+          git add .github/workflows/fix-auth-syntax.yml
+          git commit -m 'Remove temporary auth syntax workflow' || true
+          git push
